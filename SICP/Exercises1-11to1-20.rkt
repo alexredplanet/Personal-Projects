@@ -83,3 +83,80 @@
         (else (fast-expt-iter b (- n 1) (* a b)))))
 
 (fast-expt2 2 2)
+
+; Exercise 1.17
+; consider you only have the operations addition, double, and halve,
+; implement a multiplication procedure analagous to fast-expt using a logarithmic number of steps
+(define (mult a b)
+  (cond ((= b 0) 0)
+        ((even? b) (mult (double a) (halve b)))
+        (else (+ a (mult a (- b 1))))))
+
+(define (halve x)
+  (/ x 2))
+
+(define (double x)
+  (* x 2))
+
+(mult 2 27)
+
+; Exercise 1.18
+; Derive an iterative version of the fast-multiplication in 1.17
+(define (fast-mult a b)
+  (fast-mult-iter a b 0))
+(define (fast-mult-iter a b c)
+  (cond ((= b 0) c)
+        ((even? b) (fast-mult-iter (double a) (halve b) c))
+        (else (fast-mult-iter a (- b 1) (+ c a)))))
+
+(fast-mult 2 27)
+
+; Exercise 1.19
+; Requires some algebra to complete the procedure given
+; Define a1 = bq + aq + ap, b1 = bp + aq
+; Then apply transformation again to yield a2 = b1q + a1q + a1p and b2 = b1p + a1q
+; Substitute and solve for a2, b2
+; then rearrange to yield b2 = b(pp + qq) + a(2pq + qq), thus
+; p' = pp+qq and q' = 2pq+qq
+(define (fib n)
+  (fib-iter 1 0 0 1 n))
+(define (fib-iter a b p q count)
+  (cond ((= count 0) b)
+        ((even? count)
+         (fib-iter a
+                   b
+                   (+ (square p) (square q))
+                   (+ (* 2 p q) (square q))
+                   (/ count 2)))
+        (else (fib-iter (+ (* b q) (* a q) (* a p))
+                        (+ (* b p) (* a q))
+                        p
+                        q
+                        (- count 1)))))
+
+; Exercise 1.20
+(define (gcd a b)
+  (if (= b 0)
+      a
+      (gcd b (remainder a b))))
+; evaluate the above for normal order and applicative order on the example (gcd 206 40)
+; applicative order
+(gcd 206 40)
+(gcd 40 6) ; one call
+(gcd 6 4) ; one call
+(gcd 4 2) ; one call
+(gcd 2 0) ; one call
+; four calls
+; normal order
+(gcd 206 40)
+
+(if (= 40 0)
+    206
+    (gcd 40 (remainder 206 40)))
+
+(gcd 40 (remainder 206 40))
+(if (= 6 0)
+    40
+    (gcd (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))))
+
+; ... call will happen 18 times total if written out in full. 
